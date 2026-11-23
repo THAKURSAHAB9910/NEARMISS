@@ -325,6 +325,7 @@
               <th class="py-3 px-3">Near-Misses (7d)</th>
               <th class="py-3 px-3">Anomaly Status</th>
               <th class="py-3 px-3">Action Protocol</th>
+              <th class="py-3 px-3 text-right">Interactive Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-800 font-mono" id="asset_table_body">
@@ -338,6 +339,11 @@
               <td class="py-2.5 px-3">3</td>
               <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
               <td class="py-2.5 px-3 text-rose-300 font-sans">Mandatory safety stand-down & bearing check</td>
+              <td class="py-2.5 px-3 text-right">
+                <button onclick="loadAssetIntoSimulator('Refinery-North_PUMP_01', 3.82, 22, 3, 78, 70)" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-sans font-medium text-[11px] border border-amber-500/40 transition flex items-center gap-1 ml-auto">
+                  <i data-lucide="play" class="w-3 h-3"></i> Simulate
+                </button>
+              </td>
             </tr>
             <tr class="hover:bg-slate-800/40">
               <td class="py-2.5 px-3 font-medium text-white">PetroChem-Alpha_GAS_COMPRESSOR_02</td>
@@ -349,6 +355,11 @@
               <td class="py-2.5 px-3">2</td>
               <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
               <td class="py-2.5 px-3 text-rose-300 font-sans">ISO Zone D: Immediate mechanical inspection</td>
+              <td class="py-2.5 px-3 text-right">
+                <button onclick="loadAssetIntoSimulator('PetroChem-Alpha_GAS_COMPRESSOR_02', 4.65, 16, 2, 85, 65)" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-sans font-medium text-[11px] border border-amber-500/40 transition flex items-center gap-1 ml-auto">
+                  <i data-lucide="play" class="w-3 h-3"></i> Simulate
+                </button>
+              </td>
             </tr>
             <tr class="hover:bg-slate-800/40">
               <td class="py-2.5 px-3 font-medium text-white">HeavyFab-Plant3_CNC_CELL_03</td>
@@ -360,6 +371,11 @@
               <td class="py-2.5 px-3">2</td>
               <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">NOMINAL</span></td>
               <td class="py-2.5 px-3 text-amber-300 font-sans">Expedite overdue PM work order #4128</td>
+              <td class="py-2.5 px-3 text-right">
+                <button onclick="loadAssetIntoSimulator('HeavyFab-Plant3_CNC_CELL_03', 2.95, 19, 2, 65, 55)" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-sans font-medium text-[11px] border border-amber-500/40 transition flex items-center gap-1 ml-auto">
+                  <i data-lucide="play" class="w-3 h-3"></i> Simulate
+                </button>
+              </td>
             </tr>
             <tr class="hover:bg-slate-800/40">
               <td class="py-2.5 px-3 font-medium text-white">Foundry-Beta_CONVEYOR_06</td>
@@ -371,6 +387,11 @@
               <td class="py-2.5 px-3">3</td>
               <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
               <td class="py-2.5 px-3 text-amber-300 font-sans">Investigate belt slippage and near-miss logs</td>
+              <td class="py-2.5 px-3 text-right">
+                <button onclick="loadAssetIntoSimulator('Foundry-Beta_CONVEYOR_06', 2.10, 24, 3, 60, 60)" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-sans font-medium text-[11px] border border-amber-500/40 transition flex items-center gap-1 ml-auto">
+                  <i data-lucide="play" class="w-3 h-3"></i> Simulate
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -464,24 +485,82 @@
         </table>
       </div>
 
-      <!-- Evaluation Curves Gallery -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-700/60">
-        <a href="figures/pr_curves.png" target="_blank" class="block group relative overflow-hidden rounded-lg border border-slate-700 bg-slate-900 p-2 text-center hover:border-amber-500 transition">
-          <img src="figures/pr_curves.png" alt="PR Curves" class="h-28 mx-auto object-cover rounded opacity-80 group-hover:opacity-100 transition">
-          <span class="text-[11px] font-medium text-slate-300 mt-1 block">Precision-Recall Curves</span>
-        </a>
-        <a href="figures/calibration_curves.png" target="_blank" class="block group relative overflow-hidden rounded-lg border border-slate-700 bg-slate-900 p-2 text-center hover:border-amber-500 transition">
-          <img src="figures/calibration_curves.png" alt="Calibration Curves" class="h-28 mx-auto object-cover rounded opacity-80 group-hover:opacity-100 transition">
-          <span class="text-[11px] font-medium text-slate-300 mt-1 block">Reliability Diagram</span>
-        </a>
-        <a href="figures/cost_curves.png" target="_blank" class="block group relative overflow-hidden rounded-lg border border-slate-700 bg-slate-900 p-2 text-center hover:border-amber-500 transition">
-          <img src="figures/cost_curves.png" alt="Cost Curves" class="h-28 mx-auto object-cover rounded opacity-80 group-hover:opacity-100 transition">
-          <span class="text-[11px] font-medium text-slate-300 mt-1 block">Cost vs Threshold</span>
-        </a>
-        <a href="figures/shap_summary_bar.png" target="_blank" class="block group relative overflow-hidden rounded-lg border border-slate-700 bg-slate-900 p-2 text-center hover:border-amber-500 transition">
-          <img src="figures/shap_summary_bar.png" alt="SHAP Importance" class="h-28 mx-auto object-cover rounded opacity-80 group-hover:opacity-100 transition">
-          <span class="text-[11px] font-medium text-slate-300 mt-1 block">Global SHAP Drivers</span>
-        </a>
+      <!-- Evaluation Curves Gallery (Dual-fallback paths & Interactive Full-Screen Inspection) -->
+      <div class="mt-6 pt-5 border-t border-slate-700/60">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i data-lucide="image" class="w-4 h-4 text-amber-400"></i> Model Performance Diagnostics & Explainability Gallery
+          </h3>
+          <span class="text-[11px] text-slate-400">Click any card to inspect full-resolution figure</span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <!-- Card 1: PR Curves -->
+          <div onclick="openImageModal('figures/pr_curves.png', 'Precision-Recall Curves (Essential for 17.75% Class Imbalance)')" class="group cursor-pointer rounded-xl border border-slate-700 bg-slate-900/80 p-2.5 hover:border-amber-500 hover:bg-slate-800/80 transition flex flex-col justify-between">
+            <div class="h-28 overflow-hidden rounded-lg bg-slate-950 flex items-center justify-center p-1">
+              <img src="figures/pr_curves.png" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='public/figures/pr_curves.png';}" alt="PR Curves" class="h-full w-full object-contain group-hover:scale-105 transition duration-300">
+            </div>
+            <div class="mt-2 text-center">
+              <span class="text-[11px] font-semibold text-white group-hover:text-amber-400 transition block truncate">Precision-Recall</span>
+              <span class="text-[10px] text-slate-400 block">Baseline vs RF vs XGB</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Calibration Curves -->
+          <div onclick="openImageModal('figures/calibration_curves.png', 'Probability Calibration Reliability Diagram (Isotonic Regression)')" class="group cursor-pointer rounded-xl border border-slate-700 bg-slate-900/80 p-2.5 hover:border-amber-500 hover:bg-slate-800/80 transition flex flex-col justify-between">
+            <div class="h-28 overflow-hidden rounded-lg bg-slate-950 flex items-center justify-center p-1">
+              <img src="figures/calibration_curves.png" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='public/figures/calibration_curves.png';}" alt="Calibration Curves" class="h-full w-full object-contain group-hover:scale-105 transition duration-300">
+            </div>
+            <div class="mt-2 text-center">
+              <span class="text-[11px] font-semibold text-white group-hover:text-amber-400 transition block truncate">Reliability Diagram</span>
+              <span class="text-[10px] text-slate-400 block">Isotonic vs Raw Prob</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Cost Curves -->
+          <div onclick="openImageModal('figures/cost_curves.png', 'Safety Operational Cost vs Decision Threshold (Asymmetric $50k FN vs $500 FP)')" class="group cursor-pointer rounded-xl border border-slate-700 bg-slate-900/80 p-2.5 hover:border-amber-500 hover:bg-slate-800/80 transition flex flex-col justify-between">
+            <div class="h-28 overflow-hidden rounded-lg bg-slate-950 flex items-center justify-center p-1">
+              <img src="figures/cost_curves.png" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='public/figures/cost_curves.png';}" alt="Cost Curves" class="h-full w-full object-contain group-hover:scale-105 transition duration-300">
+            </div>
+            <div class="mt-2 text-center">
+              <span class="text-[11px] font-semibold text-white group-hover:text-amber-400 transition block truncate">Cost vs Threshold</span>
+              <span class="text-[10px] text-slate-400 block">Optimal Trigger Point</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Confusion Matrices -->
+          <div onclick="openImageModal('figures/confusion_matrices.png', 'Confusion Matrix Grid at Operating Decision Threshold')" class="group cursor-pointer rounded-xl border border-slate-700 bg-slate-900/80 p-2.5 hover:border-amber-500 hover:bg-slate-800/80 transition flex flex-col justify-between">
+            <div class="h-28 overflow-hidden rounded-lg bg-slate-950 flex items-center justify-center p-1">
+              <img src="figures/confusion_matrices.png" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='public/figures/confusion_matrices.png';}" alt="Confusion Matrices" class="h-full w-full object-contain group-hover:scale-105 transition duration-300">
+            </div>
+            <div class="mt-2 text-center">
+              <span class="text-[11px] font-semibold text-white group-hover:text-amber-400 transition block truncate">Confusion Matrices</span>
+              <span class="text-[10px] text-slate-400 block">TP, FP, FN, TN Grid</span>
+            </div>
+          </div>
+
+          <!-- Card 5: ROC Curves -->
+          <div onclick="openImageModal('figures/roc_curves.png', 'Receiver Operating Characteristic (ROC-AUC) Curves')" class="group cursor-pointer rounded-xl border border-slate-700 bg-slate-900/80 p-2.5 hover:border-amber-500 hover:bg-slate-800/80 transition flex flex-col justify-between">
+            <div class="h-28 overflow-hidden rounded-lg bg-slate-950 flex items-center justify-center p-1">
+              <img src="figures/roc_curves.png" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='public/figures/roc_curves.png';}" alt="ROC Curves" class="h-full w-full object-contain group-hover:scale-105 transition duration-300">
+            </div>
+            <div class="mt-2 text-center">
+              <span class="text-[11px] font-semibold text-white group-hover:text-amber-400 transition block truncate">ROC Curves</span>
+              <span class="text-[10px] text-slate-400 block">TPR vs FPR Tradeoff</span>
+            </div>
+          </div>
+
+          <!-- Card 6: SHAP Importance Bar -->
+          <div onclick="openImageModal('figures/shap_summary_bar.png', 'Global SHAP Feature Importance (Mean Absolute SHAP Value)')" class="group cursor-pointer rounded-xl border border-slate-700 bg-slate-900/80 p-2.5 hover:border-amber-500 hover:bg-slate-800/80 transition flex flex-col justify-between">
+            <div class="h-28 overflow-hidden rounded-lg bg-slate-950 flex items-center justify-center p-1">
+              <img src="figures/shap_summary_bar.png" onerror="if(!this.dataset.retry){this.dataset.retry='1';this.src='public/figures/shap_summary_bar.png';}" alt="SHAP Importance" class="h-full w-full object-contain group-hover:scale-105 transition duration-300">
+            </div>
+            <div class="mt-2 text-center">
+              <span class="text-[11px] font-semibold text-white group-hover:text-amber-400 transition block truncate">SHAP Importance</span>
+              <span class="text-[10px] text-slate-400 block">Top 15 Risk Drivers</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -578,6 +657,22 @@
           <button onclick="saveApiUrl()" class="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 font-semibold text-slate-950">Save URL</button>
         </div>
         <div id="api_test_result" class="text-[11px] p-2 rounded hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-Resolution Image Lightbox Modal -->
+  <div id="image_modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop" onclick="closeImageModal()">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full p-5 shadow-2xl relative" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <i data-lucide="bar-chart-2" class="w-5 h-5 text-amber-400"></i>
+          <h3 id="image_modal_title" class="text-sm font-bold text-white">Evaluation Figure Inspection</h3>
+        </div>
+        <button onclick="closeImageModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-2 flex justify-center bg-slate-950/60 rounded-xl mt-3 border border-slate-800/80">
+        <img id="image_modal_img" src="" alt="Evaluation Figure" class="max-h-[72vh] w-auto object-contain rounded-lg shadow-lg">
       </div>
     </div>
   </div>
@@ -949,14 +1044,59 @@
     }
 
     // ==========================================
-    // NEAR-MISS REPORT SUBMISSION
+    // NEAR-MISS REPORT SUBMISSION & FLEET ACTIONS
     // ==========================================
+    function loadAssetIntoSimulator(assetId, vib, overdue, nm, temp, fatigue) {
+      document.getElementById('input_vib').value = vib;
+      document.getElementById('input_overdue').value = overdue;
+      document.getElementById('input_nm').value = nm;
+      document.getElementById('input_temp').value = temp;
+      document.getElementById('input_fatigue').value = fatigue;
+
+      triggerPrediction();
+
+      const simEl = document.getElementById('simulator');
+      if (simEl) {
+        simEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        simEl.classList.add('ring-2', 'ring-amber-400');
+        setTimeout(() => {
+          simEl.classList.remove('ring-2', 'ring-amber-400');
+        }, 1500);
+      }
+    }
+
+    function openImageModal(imgSrc, title) {
+      const modal = document.getElementById('image_modal');
+      const img = document.getElementById('image_modal_img');
+      const titleEl = document.getElementById('image_modal_title');
+      img.src = imgSrc;
+      img.onerror = function() {
+        if (!this.dataset.retry) {
+          this.dataset.retry = '1';
+          this.src = 'public/' + imgSrc;
+        }
+      };
+      titleEl.innerText = title;
+      modal.classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+      const modal = document.getElementById('image_modal');
+      modal.classList.add('hidden');
+    }
+
     function openReportModal() {
       document.getElementById('report_modal').classList.remove('hidden');
     }
     function closeReportModal() {
       document.getElementById('report_modal').classList.add('hidden');
       document.getElementById('report_status_feedback').classList.add('hidden');
+      const btn = document.getElementById('btn_submit_report');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="send" class="w-3.5 h-3.5"></i> Submit Report';
+        if (window.lucide) lucide.createIcons();
+      }
     }
 
     async function submitNearMissReport(e) {
@@ -976,8 +1116,8 @@
         reporter_id: "OPERATOR_SHIFT_LEAD"
       };
 
-      if (isBackendOnline) {
-        try {
+      try {
+        if (isBackendOnline) {
           const res = await fetch(`${API_BASE_URL}/api/near-miss/report`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -988,21 +1128,50 @@
             feedback.className = "text-xs p-2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
             feedback.innerText = `Report #${data.report.report_id} successfully dispatched to CMMS supervisory queue.`;
             feedback.classList.remove('hidden');
+            prependReportToTable(reportPayload, data.report.report_id);
             setTimeout(closeReportModal, 1800);
             return;
           }
-        } catch (err) {
-          console.warn('API submission failed:', err);
         }
+      } catch (err) {
+        console.warn('API submission failed; saving in local session:', err);
       }
 
       // Offline client simulation feedback
+      const simId = `NMR_${Date.now().toString().slice(-6)}`;
       feedback.className = "text-xs p-2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
-      feedback.innerText = `Report logged locally (Simulated ID: NMR_${Date.now().toString().slice(-6)}). High priority alert dispatched.`;
+      feedback.innerText = `Report logged locally (Simulated ID: ${simId}). High priority alert dispatched.`;
       feedback.classList.remove('hidden');
+      prependReportToTable(reportPayload, simId);
       setTimeout(closeReportModal, 1800);
-      btn.disabled = false;
-      btn.innerText = "Submit Report";
+    }
+
+    function prependReportToTable(report, reportId) {
+      const tbody = document.getElementById('asset_table_body');
+      if (!tbody) return;
+      const newRow = document.createElement('tr');
+      newRow.className = 'hover:bg-slate-800/40 bg-rose-500/10 border-l-2 border-rose-500 transition-all';
+      newRow.innerHTML = `
+        <td class="py-2.5 px-3 font-medium text-white flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span>
+          ${report.unit_id}
+        </td>
+        <td class="py-2.5 px-3 font-sans">${report.facility}</td>
+        <td class="py-2.5 px-3 font-sans">${report.hazard_category.replace(/_/g, ' ')}</td>
+        <td class="py-2.5 px-3 font-bold text-rose-400">ALERT</td>
+        <td class="py-2.5 px-3 text-amber-400">Live Log</td>
+        <td class="py-2.5 px-3 text-slate-300">Just Now</td>
+        <td class="py-2.5 px-3 font-bold text-rose-400">+1</td>
+        <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30">${report.severity.toUpperCase()}</span></td>
+        <td class="py-2.5 px-3 text-rose-300 font-sans">${report.description.slice(0, 45)}...</td>
+        <td class="py-2.5 px-3 text-right">
+          <button onclick="loadAssetIntoSimulator('${report.unit_id}', 3.5, 14, 3, 70, 75)" class="px-2.5 py-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-sans font-medium text-[11px] border border-amber-500/40 transition">
+            Simulate
+          </button>
+        </td>
+      `;
+      tbody.insertBefore(newRow, tbody.firstChild);
+      if (window.lucide) lucide.createIcons();
     }
 
     // ==========================================
