@@ -117,3 +117,19 @@ Provides a user-friendly interface with:
 - Real-time interactive operational risk simulator
 - Survival curve visualizer and Cox regression tables
 - Automated Markdown and CSV audit report exports
+
+### 2.7 Production Web & Cloud Deployment Architecture (`public/`, `src/api/`, `vercel.json`)
+For public cloud accessibility, NEARMISS adopts a decoupled microservice architecture:
+- **Cloud Presentation Layer (Vercel / GitHub Pages)**:
+  - Responsive web dashboard (`public/index.html` & `index.html`) built with Tailwind CSS, Chart.js, and Lucide icons.
+  - Zero serverless bundle limitations: Static assets are CDN-cached globally on Vercel Edge Network.
+  - Configured with `vercel.json` URL rewrites and SPA fallback.
+  - Live Public URL: `https://thakursahab9910.github.io/NEARMISS/`
+  - Vercel 1-Click Deploy: `https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FTHAKURSAHAB9910%2FNEARMISS`
+- **Predictive Inference Microservice (`src/api/server.py`)**:
+  - High-performance FastAPI server hosting the trained Scikit-Learn, XGBoost, and SHAP pipelines.
+  - Endpoints: `/api/health`, `/api/fleet/kpis`, `/api/fleet/assets`, `/api/predict`, `/api/near-miss/report`, `/api/survival/curves`, `/api/models/evaluation`.
+  - Production CORS middleware with environment variable configuration (`CORS_ORIGINS`).
+  - Deployable on Render, Railway, AWS ECS, Fly.io, or Docker containers.
+  - Hybrid Graceful Fallback: The web frontend automatically checks backend connectivity and seamlessly switches between live FastAPI predictions and an embedded client-side safety engine.
+

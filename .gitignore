@@ -43,6 +43,7 @@ htmlcov/
 # Environment variables & secrets
 .env
 .env.*
+!.env.example
 secrets.yaml
 
 # IDEs
@@ -52,6 +53,9 @@ secrets.yaml
 # OS
 Thumbs.db
 .DS_Store
+
+# Backups
+backups/
 
 # Large datasets / archives
 data/external/**/*.zip

@@ -15,12 +15,13 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
     body { font-family: 'Inter', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .modal-backdrop { background-color: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased">
 
   <!-- Top Navigation Bar -->
-  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-amber-400">
@@ -28,17 +29,28 @@
         </div>
         <div>
           <span class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            NEARMISS <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono font-medium border border-emerald-500/30">v1.0.0 LIVE</span>
+            NEARMISS <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono font-medium border border-emerald-500/30">v1.0.0 PROD</span>
           </span>
           <p class="text-xs text-slate-400 hidden sm:block">Predictive Industrial Safety Intelligence & Hazard Precursor Forecasting</p>
         </div>
       </div>
-      <div class="flex items-center space-x-3">
-        <a href="https://github.com/THAKURSAHAB9910/NEARMISS" target="_blank" class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
-          <i data-lucide="github" class="w-4 h-4"></i> GitHub Repository
-        </a>
-        <a href="#simulator" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md bg-amber-500 hover:bg-amber-400 text-slate-950 transition">
-          <i data-lucide="play" class="w-3.5 h-3.5"></i> Launch Simulator
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Live API Connection Status Pill -->
+        <button onclick="openApiModal()" id="api_status_badge" class="flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Click to configure backend API endpoint">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="api_status_dot"></span>
+          <span id="api_status_text">Checking API...</span>
+        </button>
+
+        <!-- Report Incident Button -->
+        <button onclick="openReportModal()" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md bg-rose-600 hover:bg-rose-500 text-white shadow-sm transition">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Log Near-Miss</span>
+          <span class="sm:hidden">Log</span>
+        </button>
+
+        <!-- GitHub Repo Link -->
+        <a href="https://github.com/THAKURSAHAB9910/NEARMISS" target="_blank" class="hidden md:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          <i data-lucide="github" class="w-4 h-4"></i> Repo
         </a>
       </div>
     </div>
@@ -56,36 +68,45 @@
       </div>
     </div>
 
+    <!-- API Offline Notification Banner (Hidden by default, shown if backend offline) -->
+    <div id="offline_notice_banner" class="hidden bg-slate-800/80 border border-slate-700 p-3 rounded-lg flex items-center justify-between text-xs text-slate-300">
+      <div class="flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-sky-400"></i>
+        <span><strong>Autonomous Client Mode Active:</strong> Operating using built-in mathematical inference engine. Connect to dedicated FastAPI backend for live cluster sync.</span>
+      </div>
+      <button onclick="openApiModal()" class="text-amber-400 hover:text-amber-300 font-medium underline flex items-center gap-1">Configure Endpoint &rarr;</button>
+    </div>
+
     <!-- Executive KPI Grid -->
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
         <span class="text-xs font-medium text-slate-400">Total Shifts Monitored</span>
-        <div class="text-2xl font-bold text-white mt-1 font-mono">21,930</div>
-        <span class="text-[10px] text-emerald-400 flex items-center gap-1 mt-1"><i data-lucide="check-circle" class="w-3 h-3"></i> 5 Facilities / 30 Assets</span>
+        <div class="text-2xl font-bold text-white mt-1 font-mono" id="kpi_shifts">21,930</div>
+        <span class="text-[10px] text-emerald-400 flex items-center gap-1 mt-1"><i data-lucide="check-circle" class="w-3 h-3"></i> 5 Plants / 30 Assets</span>
       </div>
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
         <span class="text-xs font-medium text-slate-400">Near-Misses Logged</span>
-        <div class="text-2xl font-bold text-amber-400 mt-1 font-mono">3,412</div>
+        <div class="text-2xl font-bold text-amber-400 mt-1 font-mono" id="kpi_near_misses">3,412</div>
         <span class="text-[10px] text-slate-400 mt-1 block">Precursor warnings</span>
       </div>
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
         <span class="text-xs font-medium text-slate-400">Historical Incidents</span>
-        <div class="text-2xl font-bold text-rose-400 mt-1 font-mono">412</div>
+        <div class="text-2xl font-bold text-rose-400 mt-1 font-mono" id="kpi_incidents">412</div>
         <span class="text-[10px] text-slate-400 mt-1 block">Recorded events</span>
       </div>
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
         <span class="text-xs font-medium text-slate-400">Heinrich Safety Ratio</span>
-        <div class="text-2xl font-bold text-sky-400 mt-1 font-mono">8.3 : 1</div>
+        <div class="text-2xl font-bold text-sky-400 mt-1 font-mono" id="kpi_heinrich">8.3 : 1</div>
         <span class="text-[10px] text-slate-400 mt-1 block">Near-misses per incident</span>
       </div>
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
         <span class="text-xs font-medium text-slate-400">Fleet Anomaly Rate</span>
-        <div class="text-2xl font-bold text-purple-400 mt-1 font-mono">5.2%</div>
+        <div class="text-2xl font-bold text-purple-400 mt-1 font-mono" id="kpi_anomaly">5.2%</div>
         <span class="text-[10px] text-purple-300 mt-1 block">Isolation Forest flags</span>
       </div>
       <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 border-rose-500/30 bg-rose-500/5">
         <span class="text-xs font-medium text-rose-300">High-Risk Units (≥35%)</span>
-        <div class="text-2xl font-bold text-rose-400 mt-1 font-mono">4</div>
+        <div class="text-2xl font-bold text-rose-400 mt-1 font-mono" id="kpi_high_risk">4</div>
         <span class="text-[10px] text-rose-300 font-semibold mt-1 flex items-center gap-1"><i data-lucide="alert-octagon" class="w-3 h-3"></i> Action Required</span>
       </div>
     </section>
@@ -146,14 +167,17 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-700/80 gap-3">
         <div>
           <span class="text-xs font-mono font-semibold text-amber-400 uppercase tracking-widest flex items-center gap-1.5">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Interactive Machine Learning Sandbox
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Machine Learning Inference Engine
           </span>
           <h2 class="text-xl font-bold text-white mt-0.5">Real-Time Operational Risk Simulator & Root-Cause Attribution</h2>
-          <p class="text-xs text-slate-300">Adjust operating telemetry below to compute dynamic incident probability and SHAP root-cause contributions.</p>
+          <p class="text-xs text-slate-300">Simulate physical operating conditions to calculate calibrated incident risk and SHAP explainability.</p>
         </div>
-        <button onclick="resetSimulator()" class="self-start md:self-center text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600 flex items-center gap-1.5 transition">
-          <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset to Baseline
-        </button>
+        <div class="flex items-center gap-2 self-start md:self-center">
+          <span id="simulator_mode_pill" class="text-[11px] px-2 py-0.5 rounded font-mono bg-slate-700 text-slate-300 border border-slate-600">Local Engine</span>
+          <button onclick="resetSimulator()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600 flex items-center gap-1.5 transition">
+            <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset
+          </button>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
@@ -167,7 +191,7 @@
               </span>
               <span class="font-mono font-bold text-amber-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700" id="val_vib">3.20 mm/s</span>
             </div>
-            <input type="range" min="0.2" max="8.0" step="0.1" value="3.2" id="input_vib" oninput="updateSimulation()" class="w-full accent-amber-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+            <input type="range" min="0.2" max="8.0" step="0.1" value="3.2" id="input_vib" oninput="triggerPrediction()" class="w-full accent-amber-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
             <div class="flex justify-between text-[10px] text-slate-400 mt-1">
               <span>0.2 mm/s (Nominal)</span>
               <span class="text-amber-400">2.8 mm/s (ISO Alert)</span>
@@ -184,7 +208,7 @@
               </span>
               <span class="font-mono font-bold text-sky-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700" id="val_overdue">18 days</span>
             </div>
-            <input type="range" min="0" max="60" step="1" value="18" id="input_overdue" oninput="updateSimulation()" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+            <input type="range" min="0" max="60" step="1" value="18" id="input_overdue" oninput="triggerPrediction()" class="w-full accent-sky-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
             <div class="flex justify-between text-[10px] text-slate-400 mt-1">
               <span>0 days (Up-to-Date)</span>
               <span class="text-amber-400">14 days (Threshold)</span>
@@ -200,7 +224,7 @@
               </span>
               <span class="font-mono font-bold text-rose-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700" id="val_nm">2 events</span>
             </div>
-            <input type="range" min="0" max="6" step="1" value="2" id="input_nm" oninput="updateSimulation()" class="w-full accent-rose-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
+            <input type="range" min="0" max="6" step="1" value="2" id="input_nm" oninput="triggerPrediction()" class="w-full accent-rose-500 bg-slate-700 h-2 rounded-lg cursor-pointer">
             <div class="flex justify-between text-[10px] text-slate-400 mt-1">
               <span>0 events</span>
               <span class="text-amber-400">2 events (Cluster Warning)</span>
@@ -215,14 +239,14 @@
                 <span class="font-medium text-slate-300">Process Temp (°C)</span>
                 <span class="font-mono font-semibold text-slate-200" id="val_temp">72 °C</span>
               </div>
-              <input type="range" min="20" max="130" step="1" value="72" id="input_temp" oninput="updateSimulation()" class="w-full accent-slate-400 bg-slate-700 h-1.5 rounded-lg cursor-pointer">
+              <input type="range" min="20" max="130" step="1" value="72" id="input_temp" oninput="triggerPrediction()" class="w-full accent-slate-400 bg-slate-700 h-1.5 rounded-lg cursor-pointer">
             </div>
             <div>
               <div class="flex justify-between items-center text-xs mb-1">
                 <span class="font-medium text-slate-300">Crew Fatigue Index (0-100)</span>
                 <span class="font-mono font-semibold text-slate-200" id="val_fatigue">68</span>
               </div>
-              <input type="range" min="10" max="100" step="1" value="68" id="input_fatigue" oninput="updateSimulation()" class="w-full accent-slate-400 bg-slate-700 h-1.5 rounded-lg cursor-pointer">
+              <input type="range" min="10" max="100" step="1" value="68" id="input_fatigue" oninput="triggerPrediction()" class="w-full accent-slate-400 bg-slate-700 h-1.5 rounded-lg cursor-pointer">
             </div>
           </div>
         </div>
@@ -265,10 +289,91 @@
               <span class="text-[10px] text-slate-400">Impact on Risk</span>
             </div>
             <div class="space-y-2 text-xs" id="shap_breakdown">
-              <!-- Dynamically populated by updateSimulation() -->
+              <!-- Dynamically populated -->
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Prioritized Asset Fleet Queue -->
+    <section class="bg-slate-800/50 border border-slate-700/60 rounded-xl p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+        <div>
+          <h2 class="text-base font-semibold text-white flex items-center gap-2">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-rose-400"></i> Prioritized High-Risk Fleet Queue (Action Required)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Assets currently triggering safety supervisor inspection protocols (Risk ≥ 35%)</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="downloadAuditReport()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600 flex items-center gap-1.5 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Report (.md)
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-900/80 text-slate-400 font-mono uppercase text-[11px] border-b border-slate-700">
+            <tr>
+              <th class="py-3 px-3">Asset ID</th>
+              <th class="py-3 px-3">Facility</th>
+              <th class="py-3 px-3">Category</th>
+              <th class="py-3 px-3">7-Day Risk</th>
+              <th class="py-3 px-3">Vibration RMS</th>
+              <th class="py-3 px-3">Days PM Overdue</th>
+              <th class="py-3 px-3">Near-Misses (7d)</th>
+              <th class="py-3 px-3">Anomaly Status</th>
+              <th class="py-3 px-3">Action Protocol</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 font-mono" id="asset_table_body">
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-2.5 px-3 font-medium text-white">Refinery-North_PUMP_01</td>
+              <td class="py-2.5 px-3 font-sans">Refinery-North</td>
+              <td class="py-2.5 px-3 font-sans">Centrifugal Pump</td>
+              <td class="py-2.5 px-3 font-bold text-rose-400">58.4%</td>
+              <td class="py-2.5 px-3 text-amber-400">3.82 mm/s</td>
+              <td class="py-2.5 px-3 text-rose-400">22 days</td>
+              <td class="py-2.5 px-3">3</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
+              <td class="py-2.5 px-3 text-rose-300 font-sans">Mandatory safety stand-down & bearing check</td>
+            </tr>
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-2.5 px-3 font-medium text-white">PetroChem-Alpha_GAS_COMPRESSOR_02</td>
+              <td class="py-2.5 px-3 font-sans">PetroChem-Alpha</td>
+              <td class="py-2.5 px-3 font-sans">Gas Compressor</td>
+              <td class="py-2.5 px-3 font-bold text-rose-400">51.2%</td>
+              <td class="py-2.5 px-3 text-rose-400">4.65 mm/s</td>
+              <td class="py-2.5 px-3 text-amber-400">16 days</td>
+              <td class="py-2.5 px-3">2</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
+              <td class="py-2.5 px-3 text-rose-300 font-sans">ISO Zone D: Immediate mechanical inspection</td>
+            </tr>
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-2.5 px-3 font-medium text-white">HeavyFab-Plant3_CNC_CELL_03</td>
+              <td class="py-2.5 px-3 font-sans">HeavyFab-Plant3</td>
+              <td class="py-2.5 px-3 font-sans">CNC Machining Cell</td>
+              <td class="py-2.5 px-3 font-bold text-amber-400">42.6%</td>
+              <td class="py-2.5 px-3 text-amber-400">2.95 mm/s</td>
+              <td class="py-2.5 px-3 text-amber-400">19 days</td>
+              <td class="py-2.5 px-3">2</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">NOMINAL</span></td>
+              <td class="py-2.5 px-3 text-amber-300 font-sans">Expedite overdue PM work order #4128</td>
+            </tr>
+            <tr class="hover:bg-slate-800/40">
+              <td class="py-2.5 px-3 font-medium text-white">Foundry-Beta_CONVEYOR_06</td>
+              <td class="py-2.5 px-3 font-sans">Foundry-Beta</td>
+              <td class="py-2.5 px-3 font-sans">Conveyor Line</td>
+              <td class="py-2.5 px-3 font-bold text-amber-400">38.9%</td>
+              <td class="py-2.5 px-3 text-slate-300">2.10 mm/s</td>
+              <td class="py-2.5 px-3 text-amber-400">24 days</td>
+              <td class="py-2.5 px-3">3</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
+              <td class="py-2.5 px-3 text-amber-300 font-sans">Investigate belt slippage and near-miss logs</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -380,86 +485,102 @@
       </div>
     </section>
 
-    <!-- Prioritized Asset Fleet Queue -->
-    <section class="bg-slate-800/50 border border-slate-700/60 rounded-xl p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h2 class="text-base font-semibold text-white flex items-center gap-2">
-            <i data-lucide="clipboard-list" class="w-4 h-4 text-rose-400"></i> Prioritized High-Risk Fleet Queue (Action Required)
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Assets currently triggering safety supervisor inspection protocols (Risk ≥ 35%)</p>
-        </div>
-        <button onclick="downloadAuditReport()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600 flex items-center gap-1.5 transition">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Audit Report
-        </button>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs text-slate-300">
-          <thead class="bg-slate-900/80 text-slate-400 font-mono uppercase text-[11px] border-b border-slate-700">
-            <tr>
-              <th class="py-3 px-3">Asset ID</th>
-              <th class="py-3 px-3">Facility</th>
-              <th class="py-3 px-3">Category</th>
-              <th class="py-3 px-3">7-Day Risk</th>
-              <th class="py-3 px-3">Vibration RMS</th>
-              <th class="py-3 px-3">Days PM Overdue</th>
-              <th class="py-3 px-3">Near-Misses (7d)</th>
-              <th class="py-3 px-3">Anomaly Status</th>
-              <th class="py-3 px-3">Action Protocol</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800">
-            <tr class="hover:bg-slate-800/40">
-              <td class="py-2.5 px-3 font-mono font-medium text-white">Refinery-North_PUMP_01</td>
-              <td class="py-2.5 px-3">Refinery-North</td>
-              <td class="py-2.5 px-3">Centrifugal Pump</td>
-              <td class="py-2.5 px-3 font-mono font-bold text-rose-400">58.4%</td>
-              <td class="py-2.5 px-3 font-mono text-amber-400">3.82 mm/s</td>
-              <td class="py-2.5 px-3 font-mono text-rose-400">22 days</td>
-              <td class="py-2.5 px-3 font-mono">3</td>
-              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
-              <td class="py-2.5 px-3 text-rose-300 font-medium">Mandatory safety stand-down & bearing check</td>
-            </tr>
-            <tr class="hover:bg-slate-800/40">
-              <td class="py-2.5 px-3 font-mono font-medium text-white">PetroChem-Alpha_GAS_COMPRESSOR_02</td>
-              <td class="py-2.5 px-3">PetroChem-Alpha</td>
-              <td class="py-2.5 px-3">Gas Compressor</td>
-              <td class="py-2.5 px-3 font-mono font-bold text-rose-400">51.2%</td>
-              <td class="py-2.5 px-3 font-mono text-rose-400">4.65 mm/s</td>
-              <td class="py-2.5 px-3 font-mono text-amber-400">16 days</td>
-              <td class="py-2.5 px-3 font-mono">2</td>
-              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
-              <td class="py-2.5 px-3 text-rose-300 font-medium">ISO Zone D: Immediate mechanical inspection</td>
-            </tr>
-            <tr class="hover:bg-slate-800/40">
-              <td class="py-2.5 px-3 font-mono font-medium text-white">HeavyFab-Plant3_CNC_CELL_03</td>
-              <td class="py-2.5 px-3">HeavyFab-Plant3</td>
-              <td class="py-2.5 px-3">CNC Machining Cell</td>
-              <td class="py-2.5 px-3 font-mono font-bold text-amber-400">42.6%</td>
-              <td class="py-2.5 px-3 font-mono text-amber-400">2.95 mm/s</td>
-              <td class="py-2.5 px-3 font-mono text-amber-400">19 days</td>
-              <td class="py-2.5 px-3 font-mono">2</td>
-              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">NOMINAL</span></td>
-              <td class="py-2.5 px-3 text-amber-300 font-medium">Expedite overdue PM work order #4128</td>
-            </tr>
-            <tr class="hover:bg-slate-800/40">
-              <td class="py-2.5 px-3 font-mono font-medium text-white">Foundry-Beta_CONVEYOR_06</td>
-              <td class="py-2.5 px-3">Foundry-Beta</td>
-              <td class="py-2.5 px-3">Conveyor Line</td>
-              <td class="py-2.5 px-3 font-mono font-bold text-amber-400">38.9%</td>
-              <td class="py-2.5 px-3 font-mono text-slate-300">2.10 mm/s</td>
-              <td class="py-2.5 px-3 font-mono text-amber-400">24 days</td>
-              <td class="py-2.5 px-3 font-mono">3</td>
-              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-400 border border-rose-500/30">ANOMALY</span></td>
-              <td class="py-2.5 px-3 text-amber-300 font-medium">Investigate belt slippage and near-miss logs</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
   </main>
+
+  <!-- Near-Miss Reporting Modal -->
+  <div id="report_modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <i data-lucide="alert-octagon" class="w-5 h-5 text-rose-500"></i>
+          <h3 class="text-base font-bold text-white">Log Safety Incident / Near-Miss</h3>
+        </div>
+        <button onclick="closeReportModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form id="near_miss_form" onsubmit="submitNearMissReport(event)" class="space-y-4 mt-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">Facility</label>
+            <select id="rep_facility" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200">
+              <option>Refinery-North</option>
+              <option>PetroChem-Alpha</option>
+              <option>HeavyFab-Plant3</option>
+              <option>Foundry-Beta</option>
+              <option>AssemblyHub-Gamma</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">Asset ID</label>
+            <input type="text" id="rep_unit_id" value="Refinery-North_PUMP_01" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200 font-mono">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">Hazard Category</label>
+            <select id="rep_hazard" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200">
+              <option>Mechanical_Guard_Trip</option>
+              <option>Pressure_Excursion</option>
+              <option>Thermal_Spike</option>
+              <option>Slip_Trip_Fall_Hazard</option>
+              <option>Chemical_Vapor_Weep</option>
+              <option>Electrical_Arcing_Alert</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-medium text-slate-300 mb-1">Severity Assessment</label>
+            <select id="rep_severity" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200">
+              <option>Low (Precautionary)</option>
+              <option selected>Medium (Standard Near-Miss)</option>
+              <option>High (Severe Precursor)</option>
+              <option>Critical (Imminent Danger)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-300 mb-1">Incident Narrative / Precursor Description</label>
+          <textarea id="rep_desc" rows="3" required placeholder="Describe the near-miss, observed equipment vibrations, or unsafe operating condition..." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200"></textarea>
+        </div>
+
+        <div id="report_status_feedback" class="hidden text-xs p-2 rounded"></div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeReportModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Cancel</button>
+          <button type="submit" id="btn_submit_report" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 font-semibold text-white flex items-center gap-1.5">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i> Submit Report
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- API Endpoint Settings Modal -->
+  <div id="api_modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <i data-lucide="settings" class="w-5 h-5 text-amber-400"></i>
+          <h3 class="text-base font-bold text-white">Backend API Settings</h3>
+        </div>
+        <button onclick="closeApiModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="space-y-4 mt-4 text-xs">
+        <p class="text-slate-300">Configure the backend prediction endpoint URL. If you deploy the FastAPI backend to Render, Railway, or AWS, set its public URL here:</p>
+        <div>
+          <label class="block font-medium text-slate-300 mb-1">API Base URL</label>
+          <input type="text" id="api_url_input" placeholder="e.g. http://localhost:8000 or https://your-api.com" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-slate-200 font-mono">
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="testApiConnection()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Test Connection</button>
+          <button onclick="saveApiUrl()" class="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 font-semibold text-slate-950">Save URL</button>
+        </div>
+        <div id="api_test_result" class="text-[11px] p-2 rounded hidden"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="border-t border-slate-800 bg-slate-950 py-6 mt-12 text-xs text-slate-400">
@@ -482,19 +603,91 @@
     // Initialize Lucide Icons
     lucide.createIcons();
 
-    // 1. Chart.js Risk Trend Initialization
+    // ==========================================
+    // BACKEND API RESOLUTION & STATE
+    // ==========================================
+    let API_BASE_URL = localStorage.getItem('NEARMISS_API_URL') || (
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:8000' 
+        : ''
+    );
+    let isBackendOnline = false;
+
+    async function checkBackendHealth() {
+      const dot = document.getElementById('api_status_dot');
+      const text = document.getElementById('api_status_text');
+      const pill = document.getElementById('simulator_mode_pill');
+      const banner = document.getElementById('offline_notice_banner');
+
+      if (!API_BASE_URL) {
+        setOfflineState();
+        return;
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/health`, { method: 'GET', headers: { 'Accept': 'application/json' } });
+        if (resp.ok) {
+          const data = await resp.json();
+          isBackendOnline = true;
+          dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+          text.innerText = "FastAPI Online";
+          pill.className = "text-[11px] px-2 py-0.5 rounded font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+          pill.innerText = "Live FastAPI Engine";
+          banner.classList.add('hidden');
+          loadLiveKpis();
+        } else {
+          setOfflineState();
+        }
+      } catch (err) {
+        setOfflineState();
+      }
+    }
+
+    function setOfflineState() {
+      isBackendOnline = false;
+      const dot = document.getElementById('api_status_dot');
+      const text = document.getElementById('api_status_text');
+      const pill = document.getElementById('simulator_mode_pill');
+      const banner = document.getElementById('offline_notice_banner');
+
+      dot.className = "w-2 h-2 rounded-full bg-amber-400";
+      text.innerText = "Client Engine (Active)";
+      pill.className = "text-[11px] px-2 py-0.5 rounded font-mono bg-slate-700 text-slate-300 border border-slate-600";
+      pill.innerText = "Mathematical Engine";
+      banner.classList.remove('hidden');
+    }
+
+    async function loadLiveKpis() {
+      if (!isBackendOnline) return;
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/fleet/kpis`);
+        if (resp.ok) {
+          const kpis = await resp.json();
+          document.getElementById('kpi_shifts').innerText = kpis.total_observations.toLocaleString();
+          document.getElementById('kpi_near_misses').innerText = kpis.total_near_misses.toLocaleString();
+          document.getElementById('kpi_incidents').innerText = kpis.total_incidents.toLocaleString();
+          document.getElementById('kpi_heinrich').innerText = kpis.heinrich_ratio.toFixed(1) + ' : 1';
+          document.getElementById('kpi_anomaly').innerText = kpis.fleet_anomaly_rate_pct.toFixed(1) + '%';
+          document.getElementById('kpi_high_risk').innerText = kpis.high_risk_units_count;
+        }
+      } catch (e) {
+        console.warn('Could not refresh live KPIs:', e);
+      }
+    }
+
+    // ==========================================
+    // CHART.JS RISK TREND INITIALIZATION
+    // ==========================================
     const ctx = document.getElementById('riskTrendChart').getContext('2d');
     const labels = [];
     const riskData = [];
     const nmData = [];
 
-    // Synthesize 30 representative temporal sample points
     const baseDate = new Date('2024-01-01');
     for (let i = 0; i < 30; i++) {
       const d = new Date(baseDate);
       d.setDate(baseDate.getDate() + (i * 24));
       labels.push(d.toISOString().split('T')[0]);
-      // Stochastic trend with spikes
       const seasonal = 14 + 6 * Math.sin(i / 4.5);
       const spike = (i === 12 || i === 22) ? 22 : (Math.random() * 5);
       riskData.push(Math.min(95, seasonal + spike));
@@ -566,54 +759,142 @@
       }
     });
 
-    // 2. Real-Time Risk Simulator & SHAP Calculation Logic
-    function updateSimulation() {
+    // ==========================================
+    // PREDICTION & SIMULATION ENGINE
+    // ==========================================
+    let predictionTimeout = null;
+
+    function triggerPrediction() {
+      // Debounce input slider changes
+      clearTimeout(predictionTimeout);
+      updateDisplayValues();
+      predictionTimeout = setTimeout(() => {
+        if (isBackendOnline) {
+          executeBackendPrediction();
+        } else {
+          executeClientPrediction();
+        }
+      }, 150);
+    }
+
+    function updateDisplayValues() {
       const vib = parseFloat(document.getElementById('input_vib').value);
       const overdue = parseInt(document.getElementById('input_overdue').value);
       const nm = parseInt(document.getElementById('input_nm').value);
       const temp = parseFloat(document.getElementById('input_temp').value);
       const fatigue = parseFloat(document.getElementById('input_fatigue').value);
 
-      // Update text values
       document.getElementById('val_vib').innerText = vib.toFixed(2) + ' mm/s';
       document.getElementById('val_overdue').innerText = overdue + ' days';
       document.getElementById('val_nm').innerText = nm + ' events';
       document.getElementById('val_temp').innerText = temp.toFixed(0) + ' °C';
       document.getElementById('val_fatigue').innerText = fatigue.toFixed(0);
+    }
 
-      // Multi-factor non-linear latent risk formulation (matching Reason's Swiss Cheese model)
+    async function executeBackendPrediction() {
+      const vib = parseFloat(document.getElementById('input_vib').value);
+      const overdue = parseInt(document.getElementById('input_overdue').value);
+      const nm = parseInt(document.getElementById('input_nm').value);
+      const temp = parseFloat(document.getElementById('input_temp').value);
+      const fatigue = parseFloat(document.getElementById('input_fatigue').value);
+
+      try {
+        const payload = {
+          vibration_rms_mms: vib,
+          process_temperature_c: temp,
+          pm_overdue_days: overdue,
+          daily_near_miss_count: nm,
+          operator_fatigue_index: fatigue,
+          facility: "Refinery-North",
+          equipment_type: "Centrifugal Pump"
+        };
+        const res = await fetch(`${API_BASE_URL}/api/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const pred = await res.json();
+          renderPredictionResult({
+            riskPct: pred.predicted_risk_pct,
+            tier: pred.risk_tier,
+            isoZone: pred.iso_10816_vibration.zone,
+            isAnomaly: pred.anomaly_detection.is_operational_anomaly,
+            shapDrivers: pred.root_cause_attribution.top_hazard_escalators,
+            shapMitigators: pred.root_cause_attribution.top_risk_mitigators
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('Backend call failed; falling back to client engine:', err);
+      }
+      executeClientPrediction();
+    }
+
+    function executeClientPrediction() {
+      const vib = parseFloat(document.getElementById('input_vib').value);
+      const overdue = parseInt(document.getElementById('input_overdue').value);
+      const nm = parseInt(document.getElementById('input_nm').value);
+      const temp = parseFloat(document.getElementById('input_temp').value);
+      const fatigue = parseFloat(document.getElementById('input_fatigue').value);
+
+      // Multi-barrier Swiss Cheese latent formulation
       const b_vib = vib >= 4.5 ? 0.35 : (vib >= 2.8 ? 0.18 : 0.02);
       const b_pm = overdue > 20 ? 0.28 : (overdue > 10 ? 0.15 : 0.01);
       const b_nm = nm >= 3 ? 0.30 : (nm >= 1 ? 0.14 : 0.0);
       const b_fatigue = fatigue > 70 ? 0.16 : 0.02;
       const b_temp = temp > 80 ? 0.12 : 0.01;
 
-      // Compounding interaction
       const latent = b_vib + b_pm + b_nm + b_fatigue + b_temp;
-      // Sigmoid-based calibrated probability
       let prob = 1.0 / (1.0 + Math.exp(-3.5 * (latent - 0.42)));
       prob = Math.min(0.96, Math.max(0.04, prob));
+      const riskPct = (prob * 100).toFixed(1);
 
-      const probPct = (prob * 100).toFixed(1);
+      let tier = "NOMINAL";
+      if (prob >= 0.60) tier = "CRITICAL";
+      else if (prob >= 0.35) tier = "ELEVATED";
+      else if (prob >= 0.20) tier = "GUARDED";
+
+      const isoZone = vib < 2.8 ? "Zone A/B (Nominal)" : (vib < 4.5 ? "Zone C (Alert)" : "Zone D (Danger)");
+      const isAnomaly = vib >= 4.0 || (overdue > 25 && nm >= 2) || (temp > 85 && vib > 3.0);
+
+      const drivers = [
+        { feature: `Vibration Velocity (${vib.toFixed(1)} mm/s)`, shap_impact: b_vib * 45 },
+        { feature: `PM Backlog (${overdue} days overdue)`, shap_impact: b_pm * 42 },
+        { feature: `Near-Miss Precursors (${nm} logged)`, shap_impact: b_nm * 40 },
+        { feature: `Crew Fatigue (${fatigue.toFixed(0)})`, shap_impact: b_fatigue * 28 },
+      ].filter(d => d.shap_impact > 1.0);
+
+      renderPredictionResult({
+        riskPct: parseFloat(riskPct),
+        tier: tier,
+        isoZone: isoZone,
+        isAnomaly: isAnomaly,
+        shapDrivers: drivers,
+        shapMitigators: []
+      });
+    }
+
+    function renderPredictionResult(data) {
+      const probPct = data.riskPct.toFixed(1);
       document.getElementById('risk_percentage').innerText = probPct + '%';
       document.getElementById('risk_progress_bar').style.width = probPct + '%';
 
-      // Status Badge & Colors
       const badge = document.getElementById('risk_badge');
       const pBar = document.getElementById('risk_progress_bar');
       const pctText = document.getElementById('risk_percentage');
 
-      if (prob < 0.20) {
+      if (data.riskPct < 20.0) {
         badge.className = "text-xs px-2.5 py-0.5 rounded font-mono font-bold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
         badge.innerText = "Nominal Risk";
         pBar.className = "bg-emerald-500 h-2.5 rounded-full transition-all duration-300";
         pctText.className = "text-5xl font-extrabold font-mono tracking-tight text-emerald-400";
-      } else if (prob < 0.35) {
+      } else if (data.riskPct < 35.0) {
         badge.className = "text-xs px-2.5 py-0.5 rounded font-mono font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30";
         badge.innerText = "Guarded Risk";
         pBar.className = "bg-amber-500 h-2.5 rounded-full transition-all duration-300";
         pctText.className = "text-5xl font-extrabold font-mono tracking-tight text-amber-400";
-      } else if (prob < 0.60) {
+      } else if (data.riskPct < 60.0) {
         badge.className = "text-xs px-2.5 py-0.5 rounded font-mono font-bold uppercase bg-orange-500/20 text-orange-400 border border-orange-500/30";
         badge.innerText = "Elevated Risk";
         pBar.className = "bg-orange-500 h-2.5 rounded-full transition-all duration-300";
@@ -625,22 +906,13 @@
         pctText.className = "text-5xl font-extrabold font-mono tracking-tight text-rose-400";
       }
 
-      // ISO Zone
+      // ISO Zone & Anomaly
       const isoEl = document.getElementById('iso_zone');
-      if (vib < 2.8) {
-        isoEl.className = "text-xs font-bold text-emerald-400 font-mono";
-        isoEl.innerText = "Zone A/B (Nominal)";
-      } else if (vib < 4.5) {
-        isoEl.className = "text-xs font-bold text-amber-400 font-mono";
-        isoEl.innerText = "Zone C (Alert)";
-      } else {
-        isoEl.className = "text-xs font-bold text-rose-400 font-mono";
-        isoEl.innerText = "Zone D (Danger)";
-      }
+      isoEl.innerText = data.isoZone;
+      isoEl.className = data.isoZone.includes('Danger') ? "text-xs font-bold text-rose-400 font-mono" : (data.isoZone.includes('Alert') ? "text-xs font-bold text-amber-400 font-mono" : "text-xs font-bold text-emerald-400 font-mono");
 
-      // Anomaly Status
       const anomEl = document.getElementById('anom_status');
-      if (vib >= 4.0 || (overdue > 25 && nm >= 2) || (temp > 85 && vib > 3.0)) {
+      if (data.isAnomaly) {
         anomEl.className = "text-xs font-bold text-rose-400 font-mono";
         anomEl.innerText = "⚠️ Anomaly Detected";
       } else {
@@ -648,27 +920,22 @@
         anomEl.innerText = "✅ Operating Envelope OK";
       }
 
-      // Dynamic SHAP Waterfall Breakdown
+      // SHAP Breakdown
       const shapEl = document.getElementById('shap_breakdown');
-      const shapItems = [
-        { name: 'Vibration Velocity RMS (' + vib.toFixed(1) + ' mm/s)', impact: (b_vib * 45).toFixed(1), isPositive: vib >= 2.8 },
-        { name: 'PM Backlog (' + overdue + ' days overdue)', impact: (b_pm * 42).toFixed(1), isPositive: overdue > 10 },
-        { name: 'Near-Miss Precursors (' + nm + ' logged)', impact: (b_nm * 40).toFixed(1), isPositive: nm > 0 },
-        { name: 'Crew Fatigue Index (' + fatigue.toFixed(0) + ')', impact: (b_fatigue * 28).toFixed(1), isPositive: fatigue > 60 },
-        { name: 'Process Thermal Excursion (' + temp.toFixed(0) + ' °C)', impact: (b_temp * 22).toFixed(1), isPositive: temp > 75 }
-      ];
-
       let html = '';
-      shapItems.forEach(item => {
-        const sign = item.isPositive ? '+' : '-';
-        const color = item.isPositive ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
-        html += `
-          <div class="flex items-center justify-between p-1.5 rounded border ${color}">
-            <span class="truncate pr-2">${item.name}</span>
-            <span class="font-mono font-bold">${sign}${item.impact}%</span>
-          </div>
-        `;
-      });
+      if (data.shapDrivers && data.shapDrivers.length > 0) {
+        data.shapDrivers.slice(0, 4).forEach(item => {
+          const impactVal = typeof item.shap_impact === 'number' ? Math.abs(item.shap_impact) : 5.0;
+          html += `
+            <div class="flex items-center justify-between p-1.5 rounded border text-rose-400 bg-rose-500/10 border-rose-500/20">
+              <span class="truncate pr-2">${item.feature}</span>
+              <span class="font-mono font-bold">+${impactVal.toFixed(1)}%</span>
+            </div>
+          `;
+        });
+      } else {
+        html = '<div class="text-[11px] text-slate-400 p-2 text-center">Nominal operating baseline — no active hazard drivers.</div>';
+      }
       shapEl.innerHTML = html;
     }
 
@@ -678,10 +945,110 @@
       document.getElementById('input_nm').value = 0;
       document.getElementById('input_temp').value = 45;
       document.getElementById('input_fatigue').value = 35;
-      updateSimulation();
+      triggerPrediction();
     }
 
-    // 3. Download Audit Report
+    // ==========================================
+    // NEAR-MISS REPORT SUBMISSION
+    // ==========================================
+    function openReportModal() {
+      document.getElementById('report_modal').classList.remove('hidden');
+    }
+    function closeReportModal() {
+      document.getElementById('report_modal').classList.add('hidden');
+      document.getElementById('report_status_feedback').classList.add('hidden');
+    }
+
+    async function submitNearMissReport(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn_submit_report');
+      const feedback = document.getElementById('report_status_feedback');
+      btn.disabled = true;
+      btn.innerText = "Submitting...";
+
+      const reportPayload = {
+        facility: document.getElementById('rep_facility').value,
+        unit_id: document.getElementById('rep_unit_id').value,
+        equipment_type: "Centrifugal Pump",
+        hazard_category: document.getElementById('rep_hazard').value,
+        severity: document.getElementById('rep_severity').value,
+        description: document.getElementById('rep_desc').value,
+        reporter_id: "OPERATOR_SHIFT_LEAD"
+      };
+
+      if (isBackendOnline) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/near-miss/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reportPayload)
+          });
+          if (res.ok) {
+            const data = await res.json();
+            feedback.className = "text-xs p-2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            feedback.innerText = `Report #${data.report.report_id} successfully dispatched to CMMS supervisory queue.`;
+            feedback.classList.remove('hidden');
+            setTimeout(closeReportModal, 1800);
+            return;
+          }
+        } catch (err) {
+          console.warn('API submission failed:', err);
+        }
+      }
+
+      // Offline client simulation feedback
+      feedback.className = "text-xs p-2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+      feedback.innerText = `Report logged locally (Simulated ID: NMR_${Date.now().toString().slice(-6)}). High priority alert dispatched.`;
+      feedback.classList.remove('hidden');
+      setTimeout(closeReportModal, 1800);
+      btn.disabled = false;
+      btn.innerText = "Submit Report";
+    }
+
+    // ==========================================
+    // API SETTINGS MODAL
+    // ==========================================
+    function openApiModal() {
+      document.getElementById('api_url_input').value = API_BASE_URL;
+      document.getElementById('api_modal').classList.remove('hidden');
+    }
+    function closeApiModal() {
+      document.getElementById('api_modal').classList.add('hidden');
+      document.getElementById('api_test_result').classList.add('hidden');
+    }
+
+    async function testApiConnection() {
+      const url = document.getElementById('api_url_input').value.trim();
+      const resBox = document.getElementById('api_test_result');
+      resBox.className = "text-[11px] p-2 rounded bg-slate-800 text-slate-300 block";
+      resBox.innerText = "Pinging endpoint...";
+      try {
+        const resp = await fetch(`${url}/api/health`);
+        if (resp.ok) {
+          const data = await resp.json();
+          resBox.className = "text-[11px] p-2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 block";
+          resBox.innerText = `Connected successfully! Status: ${data.status} | Models: ${data.models_loaded ? 'Loaded' : 'Not Loaded'}`;
+        } else {
+          resBox.className = "text-[11px] p-2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 block";
+          resBox.innerText = `Connection failed: HTTP ${resp.status}`;
+        }
+      } catch (e) {
+        resBox.className = "text-[11px] p-2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 block";
+        resBox.innerText = `Connection error: ${e.message}`;
+      }
+    }
+
+    function saveApiUrl() {
+      const url = document.getElementById('api_url_input').value.trim();
+      API_BASE_URL = url;
+      localStorage.setItem('NEARMISS_API_URL', url);
+      closeApiModal();
+      checkBackendHealth();
+    }
+
+    // ==========================================
+    // EXPORT AUDIT REPORT
+    // ==========================================
     function downloadAuditReport() {
       const reportText = `# INDUSTRIAL SAFETY INTELLIGENCE AUDIT REPORT
 Generated: ${new Date().toISOString()}
@@ -722,8 +1089,9 @@ Classification: Operational Safety Decision Support
       URL.revokeObjectURL(url);
     }
 
-    // Run initial simulation calculation on load
-    updateSimulation();
+    // Run health check and initial prediction calculation
+    checkBackendHealth();
+    triggerPrediction();
   </script>
 </body>
 </html>

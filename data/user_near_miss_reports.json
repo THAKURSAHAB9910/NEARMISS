@@ -1,0 +1,14 @@
+[
+  {
+    "report_id": "NMR_1795448483",
+    "timestamp": "2026-11-23T21:11:23.922697Z",
+    "facility": "Refinery-North",
+    "unit_id": "Refinery-North_PUMP_01",
+    "equipment_type": "Centrifugal Pump",
+    "hazard_category": "Mechanical_Guard_Trip",
+    "severity": "High",
+    "description": "Intermittent vibration spike accompanied by guard contact.",
+    "reporter_id": "ANONYMOUS_OPERATOR",
+    "status": "LOGGED_FOR_SUPERVISORY_REVIEW"
+  }
+]
