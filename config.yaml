@@ -1,0 +1,82 @@
+# NEARMISS Configuration File
+# Predictive Industrial Safety Intelligence System
+
+project:
+  name: "NEARMISS"
+  version: "1.0.0"
+  random_seed: 42
+
+paths:
+  raw_data_dir: "data/raw"
+  external_data_dir: "data/external"
+  synthetic_data_dir: "data/synthetic"
+  processed_data_dir: "data/processed"
+  models_dir: "models"
+  reports_dir: "reports"
+  figures_dir: "reports/figures"
+
+generator:
+  num_facilities: 5
+  facilities:
+    - "Refinery-North"
+    - "PetroChem-Alpha"
+    - "HeavyFab-Plant3"
+    - "Foundry-Beta"
+    - "AssemblyHub-Gamma"
+  equipment_types:
+    - "Centrifugal Pump"
+    - "Gas Compressor"
+    - "CNC Machining Cell"
+    - "Overhead Crane"
+    - "Heat Exchanger"
+    - "Conveyor Transfer Line"
+  num_units_per_facility: 6
+  start_date: "2024-01-01"
+  end_date: "2025-12-31"
+  lookahead_window_days: 7
+  incident_base_rate: 0.045 # ~4.5% of 7-day windows have an incident
+
+splitting:
+  temporal_split: true
+  train_end_date: "2025-06-30"
+  val_end_date: "2025-09-30"
+  test_end_date: "2025-12-31"
+
+features:
+  rolling_windows_days: [7, 14, 30]
+  iso_vibration_alert_threshold: 2.8 # mm/s
+  iso_vibration_danger_threshold: 4.5 # mm/s
+  overtime_fatigue_threshold_hours: 10.0
+  maintenance_overdue_threshold_days: 14
+
+models:
+  baseline:
+    strategy: "prior" # or "stratified", "logistic_regression"
+  random_forest:
+    n_estimators: 200
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    class_weight: "balanced"
+    random_state: 42
+  xgboost:
+    n_estimators: 250
+    max_depth: 5
+    learning_rate: 0.05
+    subsample: 0.85
+    colsample_bytree: 0.85
+    scale_pos_weight: 4.0
+    random_state: 42
+    eval_metric: "logloss"
+  anomaly_detector:
+    contamination: 0.05
+    random_state: 42
+    n_estimators: 150
+  calibration:
+    method: "isotonic"
+    cv: "prefit"
+
+evaluation:
+  decision_threshold: 0.35 # business-optimized safety threshold prioritizing recall
+  cost_false_negative: 50000 # Cost of unpredicted safety incident (injury, downtime, OSHA fines)
+  cost_false_positive: 1500 # Cost of precautionary inspection or preventive slowdown
