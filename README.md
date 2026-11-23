@@ -1,11 +1,18 @@
 # NEARMISS: Predictive Industrial Safety Intelligence System
 ### Proactive Leading-Indicator Forecasting, Multi-Sensor Anomaly Detection & SHAP Root-Cause Attribution
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-THAKURSAHAB9910%2FNEARMISS-blue.svg?logo=github)](https://github.com/THAKURSAHAB9910/NEARMISS)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FTHAKURSAHAB9910%2FNEARMISS)
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.14-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Framework](https://img.shields.io/badge/Architecture-Modular%20Pipeline-orange.svg)]()
 [![Tests](https://img.shields.io/badge/Pytest-20%20Passed-brightgreen.svg)]()
 [![Explainability](https://img.shields.io/badge/Explainability-SHAP%20TreeExplainer-purple.svg)]()
+
+> **LIVE DASHBOARD & REPOSITORY LINKS**:
+> - 🌐 **GitHub Repository**: [https://github.com/THAKURSAHAB9910/NEARMISS](https://github.com/THAKURSAHAB9910/NEARMISS)
+> - 🚀 **Deploy to Vercel (1-Click)**: Click the **Deploy with Vercel** button above or import `THAKURSAHAB9910/NEARMISS` into your Vercel Dashboard for instant deployment!
+> - 💻 **Local Streamlit Dashboard**: `streamlit run app/app.py`
+> - 🖥️ **Static Web Dashboard**: Open `index.html` or `public/index.html` in any browser.
 
 ---
 
