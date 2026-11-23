@@ -60,3 +60,5 @@ backups/
 # Large datasets / archives
 data/external/**/*.zip
 data/processed/**/*.parquet
+
+.vercel
