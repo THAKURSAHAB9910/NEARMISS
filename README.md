@@ -8,11 +8,11 @@
 [![Tests](https://img.shields.io/badge/Pytest-20%20Passed-brightgreen.svg)]()
 [![Explainability](https://img.shields.io/badge/Explainability-SHAP%20TreeExplainer-purple.svg)]()
 
-> **LIVE DASHBOARD & REPOSITORY LINKS**:
-> - 🌐 **GitHub Repository**: [https://github.com/THAKURSAHAB9910/NEARMISS](https://github.com/THAKURSAHAB9910/NEARMISS)
-> - 🚀 **Deploy to Vercel (1-Click)**: Click the **Deploy with Vercel** button above or import `THAKURSAHAB9910/NEARMISS` into your Vercel Dashboard for instant deployment!
-> - 💻 **Local Streamlit Dashboard**: `streamlit run app/app.py`
-> - 🖥️ **Static Web Dashboard**: Open `index.html` or `public/index.html` in any browser.
+> **LIVE DEMO & DEPLOYMENT LINKS**:
+> - 🌐 **Live Web Dashboard (Instant Access)**: [https://thakursahab9910.github.io/NEARMISS/](https://thakursahab9910.github.io/NEARMISS/)
+> - 🐙 **GitHub Repository**: [https://github.com/THAKURSAHAB9910/NEARMISS](https://github.com/THAKURSAHAB9910/NEARMISS)
+> - ⚡ **Deploy to Vercel (1-Click)**: Click [Deploy with Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FTHAKURSAHAB9910%2FNEARMISS) to import directly to your Vercel account.
+> - 💻 **Local Streamlit Dashboard**: Run `streamlit run app/app.py` for the full native multi-tab UI.
 
 ---
 
